@@ -1,4 +1,5 @@
-import CustomerRepositoryInterface from "../../../domain/customer/repository/customer-repository.interface";
+
+import CustomerRepositoryInterface from "../../../customer/repository/customer-repository.interface";
 import { InputFindCustomerDto, OutputFindCustomerDto } from "./find.customer.dto";
 
 export class FindCustomerUseCase {

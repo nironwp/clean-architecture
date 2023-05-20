@@ -1,7 +1,8 @@
-import Product from "../../../domain/product/entity/product"
+
 import { InputListProductDto } from "./list.product.dto"
 import { v4 as uuid } from 'uuid';
 import { ListProductUseCase } from "./list.product.usecase";
+import Product from "../../../product/entity/product";
 
 const product1 = new Product(uuid(), 'Product A', 10)
 const product2 = new Product(uuid(), 'Product B', 20)

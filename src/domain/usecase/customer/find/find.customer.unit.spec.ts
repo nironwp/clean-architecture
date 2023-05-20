@@ -1,5 +1,6 @@
-import Customer from "../../../domain/customer/entity/customer";
-import Address from "../../../domain/customer/value-object/address";
+
+import Customer from "../../../customer/entity/customer";
+import Address from "../../../customer/value-object/address";
 import { InputFindCustomerDto, OutputFindCustomerDto } from "./find.customer.dto";
 import { FindCustomerUseCase } from "./find.customer.usecase";
 const costumer = new Customer("1", "John Doe")

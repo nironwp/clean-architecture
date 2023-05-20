@@ -1,5 +1,6 @@
-import CustomerFactory from "../../../domain/customer/factory/customer.factory"
-import Address from "../../../domain/customer/value-object/address"
+
+import CustomerFactory from "../../../customer/factory/customer.factory"
+import Address from "../../../customer/value-object/address"
 import { InputListCustomerDto, OutputListCostumerDto } from "./list.customer.dto"
 import { ListCustomerUseCase } from "./list.customer.usecase"
 

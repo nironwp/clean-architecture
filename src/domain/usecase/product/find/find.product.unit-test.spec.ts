@@ -1,7 +1,8 @@
-import Product from "../../../domain/product/entity/product"
+
 import { InputFindProductDto } from "./find.product.dto"
 import { v4 as uuid } from 'uuid';
 import { FindProductUseCase } from "./find.product.usecase";
+import Product from "../../../product/entity/product";
 
 const product = new Product(uuid(), 'Product A', 10)
 

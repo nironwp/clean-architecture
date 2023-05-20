@@ -1,4 +1,5 @@
-import ProductFactory from '../../../domain/product/factory/product.factory';
+
+import ProductFactory from '../../../product/factory/product.factory';
 import { InputCreateProductDto } from './create.product.dto';
 import { CreateProductUseCase } from './create.product.usecase';
 const product = ProductFactory.create('a', 'Product A', 10);

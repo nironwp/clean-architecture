@@ -1,7 +1,9 @@
-import Product from '../../../domain/product/entity/product';
+
+import Product from '../../../product/entity/product';
+import ProductRepositoryInterface from '../../../product/repository/product-repository.interface';
 import { InputCreateProductDto, OutputCreateProductDto } from './create.product.dto';
 import { v4 as uuid } from 'uuid';
-import ProductRepositoryInterface from '../../../domain/product/repository/product-repository.interface';
+
 export class CreateProductUseCase {
     constructor(private repository: ProductRepositoryInterface) {}
 

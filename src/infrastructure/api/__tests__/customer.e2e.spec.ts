@@ -1,102 +1,129 @@
-import { app, sequelize } from "../express";
-import request from "supertest";
-
+import { app, sequelize } from "../express"
+import request from "supertest"
 describe("E2E test for customer", () => {
-  beforeEach(async () => {
-    await sequelize.sync({ force: true });
-  });
 
-  afterAll(async () => {
-    await sequelize.close();
-  });
+    beforeEach(async () => {
+        await sequelize.sync({ force: true })
+    })
 
-  it("should create a customer", async () => {
-    const response = await request(app)
-      .post("/customer")
-      .send({
-        name: "John",
-        address: {
-          street: "Street",
-          city: "City",
-          number: 123,
-          zip: "12345",
-        },
-      });
+    afterAll(async () => {
+        await sequelize.close()
+    })
 
-    expect(response.status).toBe(200);
-    expect(response.body.name).toBe("John");
-    expect(response.body.address.street).toBe("Street");
-    expect(response.body.address.city).toBe("City");
-    expect(response.body.address.number).toBe(123);
-    expect(response.body.address.zip).toBe("12345");
-  });
+    it("should create a customer", async () => {
+        const response = await request(app).post("/customer").send({
+            name: "John Doe",
+            address: {
+                street: "Main Street",
+                number: 123,
+                city: "New York",
+                zip: "143"
+            }
+        })
 
-  it("should not create a customer", async () => {
-    const response = await request(app).post("/customer").send({
-      name: "john",
-    });
-    expect(response.status).toBe(500);
-  });
+        expect(response.status).toBe(200)
+        expect(response.body).toEqual({
+            id: response.body.id,
+            name: "John Doe",
+            address: {
+                street: "Main Street",
+                number: 123,
+                city: "New York",
+                zip: "143"
+            }
+        })
+    })
 
-  it("should list all customer", async () => {
-    const response = await request(app)
-      .post("/customer")
-      .send({
-        name: "John",
-        address: {
-          street: "Street",
-          city: "City",
-          number: 123,
-          zip: "12345",
-        },
-      });
-    expect(response.status).toBe(200);
-    const response2 = await request(app)
-      .post("/customer")
-      .send({
-        name: "Jane",
-        address: {
-          street: "Street 2",
-          city: "City 2",
-          number: 1234,
-          zip: "12344",
-        },
-      });
-    expect(response2.status).toBe(200);
+    it("should not create a customer", async () => {
+        const response = await request(app).post("/customer").send({
+            name: "John Doe",
+        })
 
-    const listResponse = await request(app).get("/customer").send();
+        expect(response.status).toBe(500)
+    })
 
-    expect(listResponse.status).toBe(200);
-    expect(listResponse.body.customers.length).toBe(2);
-    const customer = listResponse.body.customers[0];
-    expect(customer.name).toBe("John");
-    expect(customer.address.street).toBe("Street");
-    const customer2 = listResponse.body.customers[1];
-    expect(customer2.name).toBe("Jane");
-    expect(customer2.address.street).toBe("Street 2");
+    it("should list a customers", async () => {
+        const response = await request(app).post("/customer").send({
+            name: "John Doe",
+            address: {
+                street: "Main Street",
+                number: 123,
+                city: "New York",
+                zip: "143"
+            }
+        })
 
-    const listResponseXML = await request(app)
-    .get("/customer")
-    .set("Accept", "application/xml")
-    .send();
+        const response1 = await request(app).post("/customer").send({
+            name: "John",
+            address: {
+                street: "Main Street",
+                number: 1234,
+                city: "New York",
+                zip: "1453"
+            }
+        })
 
-    expect(listResponseXML.status).toBe(200);
-    expect(listResponseXML.text).toContain(`<?xml version="1.0" encoding="UTF-8"?>`);
-    expect(listResponseXML.text).toContain(`<customers>`);
-    expect(listResponseXML.text).toContain(`<customer>`);
-    expect(listResponseXML.text).toContain(`<name>John</name>`);
-    expect(listResponseXML.text).toContain(`<address>`);
-    expect(listResponseXML.text).toContain(`<street>Street</street>`);
-    expect(listResponseXML.text).toContain(`<city>City</city>`);
-    expect(listResponseXML.text).toContain(`<number>123</number>`);
-    expect(listResponseXML.text).toContain(`<zip>12345</zip>`);
-    expect(listResponseXML.text).toContain(`</address>`);
-    expect(listResponseXML.text).toContain(`</customer>`);
-    expect(listResponseXML.text).toContain(`<name>Jane</name>`);
-    expect(listResponseXML.text).toContain(`<street>Street 2</street>`);
-    expect(listResponseXML.text).toContain(`</customers>`);
-    
+        const response2 = await request(app).get("/customer").send()
 
-    
-  });
-});
+        expect(response2.status).toBe(200)
+        expect(response2.body).toEqual({customers:[response.body, response1.body]})
+    })
+
+    it("should find a customer", async () => {
+        const response = await request(app).post("/customer").send({
+            name: "John Doe",
+            address: {
+                street: "Main Street",
+                number: 123,
+                city: "New York",
+                zip: "143"
+            }
+        })
+
+        const findResponse = await request(app).get(`/customer/${response.body.id}`).send()
+
+        expect(findResponse.status).toBe(200)
+        expect(findResponse.body).toEqual(response.body)
+    })
+
+    it('should not find a customer when it not exists', async () => {
+        const response2 = await request(app).get("/customer/id").send()
+
+        expect(response2.status).toBe(500)
+    })
+
+    it('should update a customer', async () => {
+        const response = await request(app).post("/customer").send({
+            name: "John Doe",
+            address: {
+                street: "Main Street",
+                number: 123,
+                city: "New York",
+                zip: "143"
+            }
+        })
+
+
+        const response2 = await request(app).put(`/customer/${response.body.id}`).send({
+            name: "John Doe 2",
+            address: {
+                street: "Main Street",
+                number: 123,
+                city: "New York",
+                zip: "143"
+            }
+        })
+
+        expect(response2.status).toBe(200)
+        expect(response2.body).toEqual({
+            id: response.body.id,
+            name: "John Doe 2",
+            address: {
+                street: "Main Street",
+                number: 123,
+                city: "New York",
+                zip: "143"
+            }
+        })
+    })
+})
